@@ -8,6 +8,7 @@ import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { siteConfig, navLinks } from "@/lib/site";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/logo";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -46,12 +47,10 @@ export function Navbar() {
         <Link
           href="/"
           className="flex items-center gap-2 rounded-sm"
-          aria-label={`${siteConfig.name} — inicio`}
+          aria-label={`BL, ${siteConfig.name} — inicio`}
           onClick={() => setOpen(false)}
         >
-          <span className="font-display text-2xl font-semibold tracking-tight text-bl-gold md:text-3xl">
-            BL
-          </span>
+          <Logo className="h-6 md:h-7" />
           <span className="hidden font-display text-lg text-foreground sm:inline">
             {siteConfig.name}
           </span>
@@ -63,10 +62,10 @@ export function Navbar() {
             <li key={link.href}>
               <Link
                 href={link.href}
-                className="group relative text-sm text-foreground/80 transition-colors hover:text-foreground"
+                className="group relative inline-flex min-h-11 items-center text-sm text-foreground/80 transition-colors hover:text-foreground"
               >
                 {link.label}
-                <span className="absolute -bottom-1 left-0 h-px w-0 bg-bl-gold transition-all duration-300 group-hover:w-full" />
+                <span className="absolute bottom-2 left-0 h-px w-0 bg-bl-gold transition-all duration-300 group-hover:w-full" />
               </Link>
             </li>
           ))}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { siteConfig, navLinks } from "@/lib/site";
+import { Logo } from "@/components/logo";
 
 export function Footer() {
   const year = 2026; // fijo: el entorno de build no expone la fecha actual
@@ -12,9 +13,7 @@ export function Footer() {
           {/* Marca */}
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-display text-2xl font-semibold text-bl-gold">
-                BL
-              </span>
+              <Logo className="h-6" />
               <span className="font-display text-lg">{siteConfig.name}</span>
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
@@ -35,7 +34,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-foreground/80 transition-colors hover:text-foreground"
+                    className="inline-flex min-h-11 items-center text-sm text-foreground/80 transition-colors hover:text-foreground"
                   >
                     {link.label}
                   </Link>
@@ -55,7 +54,7 @@ export function Footer() {
                   href={`https://wa.me/1${siteConfig.contact.whatsapp}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="transition-colors hover:text-foreground"
+                  className="inline-flex min-h-11 items-center transition-colors hover:text-foreground"
                 >
                   WhatsApp · {siteConfig.contact.phone}
                 </a>
@@ -63,7 +62,7 @@ export function Footer() {
               <li>
                 <a
                   href={`mailto:${siteConfig.contact.email}`}
-                  className="transition-colors hover:text-foreground"
+                  className="inline-flex min-h-11 items-center transition-colors hover:text-foreground"
                 >
                   {siteConfig.contact.email}
                 </a>
@@ -73,7 +72,7 @@ export function Footer() {
                   href={siteConfig.contact.instagramUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="transition-colors hover:text-foreground"
+                  className="inline-flex min-h-11 items-center transition-colors hover:text-foreground"
                 >
                   Instagram · {siteConfig.contact.instagram}
                 </a>
