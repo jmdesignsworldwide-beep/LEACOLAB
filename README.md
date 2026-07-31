@@ -37,11 +37,30 @@ el preset del dashboard — el build no depende de ninguna configuración manual
 
 ## 🚦 Restricción activa de rendimiento — LCP
 El presupuesto es **LCP < 2.5s en móvil (4G)** y **JS de ruta inicial < 200 KB comprimido**.
-En la Tanda 1 (solo shell, sin fotos) el LCP quedó en ~2.6s — **ya rozando el límite**.
+En la Tanda 1, con throttling **real** (devtools), el LCP quedó en **1.6s** (FCP = LCP). El método
+**simulado** (Lantern / PageSpeed Insights) reporta ~2.6s por una sobrestimación de render-delay.
 
 **Regla:** cada tanda que agregue peso (imágenes, librerías, componentes pesados) **reporta el
-LCP móvil en su PR**. Si supera 2.5s, **se corrige en esa misma tanda**, no al final.
+LCP móvil en su PR**. Si supera 2.5s (throttling real), **se corrige en esa misma tanda**, no al final.
 La imagen del hero (Tanda 3) es el riesgo principal: exige AVIF, `priority` y `fetchPriority="high"`.
+
+### 🔒 REGLA DE ORO — above-the-fold sin JavaScript
+**Nada por encima del pliegue puede depender de JavaScript para ser visible.** El texto del primer
+pliegue debe ser pintable desde el HTML inicial — **nunca** `opacity: 0` puesto por JS (Framer
+`initial`). Animar la opacidad del elemento LCP lo hunde bajo throttling (fue la causa del LCP alto
+en Tanda 1). Framer Motion se reserva para **después** del primer pliegue: scroll, transiciones de
+sección, micro-interacciones.
+
+### ⚠️ Tanda 3 — animación del titular del hero: CSS PURO, no JS
+El documento de movimiento pide el titular entrando por máscara, palabra por palabra
+(`overflow:hidden`, cada palabra sube desde `y:100%`, stagger 70ms). **Implementarlo con Framer
+montando estado inicial vuelve a hundir el LCP.** Hacerlo así:
+- **Keyframes CSS** que corran solos, sin esperar hidratación.
+- El texto **existe y es pintable** desde el HTML inicial (nada de `opacity:0` por JS).
+- Estado inicial con `@starting-style` o keyframes que **arranquen desde visible** y hagan el
+  recorrido, no al revés.
+- Máscara (`overflow:hidden`) y `transform` de las palabras = CSS; el **stagger con
+  `animation-delay` calculado por índice**, no con orquestación de JS.
 
 ---
 
@@ -49,9 +68,12 @@ La imagen del hero (Tanda 3) es el riesgo principal: exige AVIF, `priority` y `f
 Estos puntos quedan puestos a propósito mientras el sitio está en construcción.
 **Retirarlos/actualizarlos es requisito de lanzamiento — olvidarlos sería el peor error.**
 
-- [ ] **Retirar el `noindex`** en las 3 capas: `<meta name="robots">` del placeholder / metadata del
-      layout raíz de Next, header `X-Robots-Tag` en `vercel.json`, y `robots.txt` (`Disallow: /`).
+- [ ] **Retirar el `noindex`** en las 3 capas: `robots` del metadata del layout raíz,
+      `app/robots.ts` (`Disallow: /`), y el header `X-Robots-Tag` en `next.config.mjs`.
 - [ ] **`NEXT_PUBLIC_SITE_URL`** por entorno: Production = `https://beautybyleela.com`,
       Preview = URL de preview de Vercel. Sin esto, Google indexa el dominio de Vercel.
 - [ ] Apuntar el dominio `beautybyleela.com` a Vercel **solo con A/CNAME** — no tocar los MX (correo).
 - [ ] Confirmar subdominio real de Setmore (`bylela` vs `byleela`) y actualizar la env var.
+- [ ] **Pasada de rendimiento:** investigar el LCP del método **simulado** (Lantern / PageSpeed
+      Insights) — en Tanda 1 marcaba ~2.6s (real 1.6s). Es el número que ve cualquiera que evalúe
+      el sitio desde fuera; la palanca es recortar Framer Motion del hilo principal.
