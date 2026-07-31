@@ -1,0 +1,4 @@
+# PLACEHOLDER — bloqueo total hasta el lanzamiento.
+# ⚠️ RETIRAR EN TANDA 12 (checklist de lanzamiento).
+User-agent: *
+Disallow: /
