@@ -62,10 +62,13 @@ export function Navbar() {
             <li key={link.href}>
               <Link
                 href={link.href}
-                className="group relative inline-flex min-h-11 items-center text-sm text-foreground/80 transition-colors hover:text-foreground"
+                className="group inline-flex min-h-11 items-center text-sm text-foreground/80 transition-colors hover:text-foreground"
               >
-                {link.label}
-                <span className="absolute bottom-2 left-0 h-px w-0 bg-bl-gold transition-all duration-300 group-hover:w-full" />
+                <span className="relative">
+                  {link.label}
+                  {/* Subrayado dorado que crece desde la izquierda al hover */}
+                  <span className="absolute -bottom-1 left-0 h-px w-0 bg-bl-gold transition-all duration-300 group-hover:w-full" />
+                </span>
               </Link>
             </li>
           ))}

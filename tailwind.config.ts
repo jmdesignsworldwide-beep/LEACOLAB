@@ -79,8 +79,9 @@ const config: Config = {
         "fluid-lg": "clamp(1.125rem, 1rem + 0.6vw, 1.375rem)",
         "fluid-xl": "clamp(1.375rem, 1.1rem + 1.2vw, 2rem)",
         "fluid-2xl": "clamp(1.75rem, 1.3rem + 2.2vw, 3rem)",
-        "fluid-3xl": "clamp(2.25rem, 1.5rem + 3.6vw, 4.5rem)",
-        "fluid-hero": "clamp(2.75rem, 1.4rem + 6.4vw, 7rem)",
+        "fluid-3xl": "clamp(2.25rem, 1.5rem + 3.2vw, 3.75rem)",
+        // Tope máximo controlado: no crece sin límite en pantallas anchas
+        "fluid-hero": "clamp(2.5rem, 1.6rem + 3.8vw, 5rem)",
       },
       borderRadius: {
         lg: "var(--radius)",

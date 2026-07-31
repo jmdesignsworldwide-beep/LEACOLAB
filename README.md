@@ -35,6 +35,16 @@ el preset del dashboard — el build no depende de ninguna configuración manual
 
 ---
 
+## 🚦 Restricción activa de rendimiento — LCP
+El presupuesto es **LCP < 2.5s en móvil (4G)** y **JS de ruta inicial < 200 KB comprimido**.
+En la Tanda 1 (solo shell, sin fotos) el LCP quedó en ~2.6s — **ya rozando el límite**.
+
+**Regla:** cada tanda que agregue peso (imágenes, librerías, componentes pesados) **reporta el
+LCP móvil en su PR**. Si supera 2.5s, **se corrige en esa misma tanda**, no al final.
+La imagen del hero (Tanda 3) es el riesgo principal: exige AVIF, `priority` y `fetchPriority="high"`.
+
+---
+
 ## ⚠️ Deuda técnica — CHECKLIST DE LANZAMIENTO (Tanda 12)
 Estos puntos quedan puestos a propósito mientras el sitio está en construcción.
 **Retirarlos/actualizarlos es requisito de lanzamiento — olvidarlos sería el peor error.**
