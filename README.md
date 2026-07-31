@@ -68,8 +68,13 @@ montando estado inicial vuelve a hundir el LCP.** Hacerlo así:
 Estos puntos quedan puestos a propósito mientras el sitio está en construcción.
 **Retirarlos/actualizarlos es requisito de lanzamiento — olvidarlos sería el peor error.**
 
-- [ ] **Retirar el `noindex`** en las 3 capas: `robots` del metadata del layout raíz,
-      `app/robots.ts` (`Disallow: /`), y el header `X-Robots-Tag` en `next.config.mjs`.
+- [ ] **Retirar el `noindex` GLOBAL** en las 3 capas: `robots` del metadata del layout raíz,
+      `app/robots.ts` (cambiar `disallow: ["/", "/portal"]` → `["/portal"]`), y el header global
+      `noindexGlobal` en `next.config.mjs` (source `/:path*`).
+      - 🚨 **NO TOCAR EL `noindex` DEL PORTAL.** Es PERMANENTE y vive aparte: `app/portal/layout.tsx`,
+        la regla `/portal` en `robots.ts`, y `noindexPortal` (source `/portal/:path*`) en `next.config.mjs`.
+        El día del lanzamiento se retira noindex de todos lados — **ESE es el momento en que se expone
+        el panel de admin por error. El del portal se queda.**
 - [ ] **`NEXT_PUBLIC_SITE_URL`** por entorno: Production = `https://beautybyleela.com`,
       Preview = URL de preview de Vercel. Sin esto, Google indexa el dominio de Vercel.
 - [ ] Apuntar el dominio `beautybyleela.com` a Vercel **solo con A/CNAME** — no tocar los MX (correo).

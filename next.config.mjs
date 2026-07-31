@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 
-// ⚠️ noindex mientras el sitio está en construcción. RETIRAR EN TANDA 12.
+// Cabeceras de seguridad SIEMPRE activas (no se tocan en el lanzamiento).
 const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -10,8 +10,6 @@ const securityHeaders = [
     key: "Strict-Transport-Security",
     value: "max-age=63072000; includeSubDomains; preload",
   },
-  // ⚠️ RETIRAR EN TANDA 12 (junto con app/robots.ts y el robots del metadata)
-  { key: "X-Robots-Tag", value: "noindex, nofollow" },
   {
     key: "Content-Security-Policy",
     value: [
@@ -29,6 +27,13 @@ const securityHeaders = [
   },
 ];
 
+// ⚠️ noindex GLOBAL — TEMPORAL mientras el sitio está en construcción.
+// RETIRAR EN TANDA 12 (junto con robots.ts y el `robots` del layout raíz).
+const noindexGlobal = { key: "X-Robots-Tag", value: "noindex, nofollow" };
+
+// ⚠️ noindex del PORTAL — PERMANENTE. NO RETIRAR NUNCA, ni en la Tanda 12.
+const noindexPortal = { key: "X-Robots-Tag", value: "noindex, nofollow" };
+
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -37,7 +42,12 @@ const nextConfig = {
     formats: ["image/avif", "image/webp"],
   },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      // El portal primero: su noindex es permanente.
+      { source: "/portal/:path*", headers: [...securityHeaders, noindexPortal] },
+      // Resto del sitio: seguridad + noindex temporal (se quita en Tanda 12).
+      { source: "/:path*", headers: [...securityHeaders, noindexGlobal] },
+    ];
   },
 };
 
