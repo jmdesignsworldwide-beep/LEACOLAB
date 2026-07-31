@@ -6,6 +6,11 @@ import type { ReactNode } from "react";
 // Easing editorial — el mismo de la Dirección de Movimiento (entradas)
 const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 
+/**
+ * Revelado vinculado al scroll (patrón del documento de movimiento):
+ * anima al entrar en viewport, una sola vez. No usar sobre el elemento LCP
+ * del primer pliegue — ahí el contenido se renderiza visible directamente.
+ */
 export function Reveal({
   children,
   delay = 0,
@@ -29,7 +34,8 @@ export function Reveal({
   return (
     <motion.div
       initial="hidden"
-      animate="show"
+      whileInView="show"
+      viewport={{ once: true, margin: "0px 0px -10% 0px" }}
       variants={variants}
       className={className}
     >

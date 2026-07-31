@@ -10,7 +10,8 @@ const fraunces = Fraunces({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-fraunces",
-  axes: ["SOFT", "WONK"],
+  // Sin ejes extra (SOFT/WONK): el default de Fraunces ya es crisp (WONK 0),
+  // así el archivo variable pesa menos. opsz se mantiene por optical-sizing.
 });
 
 const geist = Geist({
