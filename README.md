@@ -29,10 +29,10 @@ _Diseñado por JM Nexus Designs._
 
 ---
 
-## 🔧 Acción pendiente en Vercel (Tanda 1)
-- [ ] **Vercel → Framework Preset: devolver a `Next.js`.** Durante la Tanda 0 se puso en
-      `Other`. Ahora que la app Next.js existe, cambiarlo de vuelta en
-      Vercel → Project → Settings → Build & Development Settings (o dejar que Vercel lo autodetecte).
+## 🔧 Configuración de Vercel (Tanda 1)
+- [x] **Framework = Next.js** forzado en `vercel.json` (`"framework": "nextjs"`), que tiene
+      prioridad sobre el preset del dashboard. En la Tanda 0 el preset quedó en `Other` y el
+      build fallaba; con esto ya no depende de tocar el dashboard.
 - [x] ~~Retirar el placeholder estático~~ — hecho: `index.html`/`favicon.svg`/`robots.txt` reemplazados
       por la app Next.js. El `noindex` vive ahora en el metadata del layout, `app/robots.ts` y los
       headers de `next.config.mjs` (se mantiene hasta Tanda 12).
