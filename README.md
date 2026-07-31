@@ -29,6 +29,15 @@ _Diseñado por JM Nexus Designs._
 
 ---
 
+## 🔧 Pendientes al empezar la Tanda 1
+- [ ] **Vercel → Framework Preset: devolver a `Next.js`.** Durante la Tanda 0 se puso en
+      `Other` (aún no había app Next.js y el build fallaba). Al scaffoldear Next.js en la Tanda 1,
+      cambiarlo de vuelta en Vercel → Project → Settings → Build & Development Settings.
+- [ ] Retirar el placeholder estático (`index.html`, `favicon.svg`, `robots.txt`) al montar la app Next.js
+      (el `noindex` se migra al metadata del layout raíz y se mantiene hasta Tanda 12).
+
+---
+
 ## ⚠️ Deuda técnica — CHECKLIST DE LANZAMIENTO (Tanda 12)
 Estos puntos quedan puestos a propósito mientras el sitio está en construcción.
 **Retirarlos/actualizarlos es requisito de lanzamiento — olvidarlos sería el peor error.**
