@@ -13,22 +13,9 @@ create or replace function public.set_updated_at()
 returns trigger language plpgsql as $$
 begin new.updated_at = now(); return new; end;
 $$;
-
--- Rol del usuario del portal para el auth.uid() actual (o null).
-create or replace function public.portal_rol()
-returns text language sql stable security definer set search_path = public as $$
-  select rol from public.usuarios_portal where id = auth.uid() and activo = true
-$$;
-
-create or replace function public.es_admin()
-returns boolean language sql stable security definer set search_path = public as $$
-  select coalesce(public.portal_rol() = 'admin', false)
-$$;
-
-create or replace function public.es_staff()
-returns boolean language sql stable security definer set search_path = public as $$
-  select coalesce(public.portal_rol() in ('admin','editor'), false)
-$$;
+-- Nota: los helpers de rol (portal_rol/es_admin/es_staff) se definen en la
+-- sección 2b, después de crear usuarios_portal (las funciones SQL se validan
+-- al crearse y referencian esa tabla).
 
 -- ── 2. Tablas ───────────────────────────────────────────────────────────────
 
@@ -261,6 +248,22 @@ create table if not exists public.audit_log (
   registro_id text,
   diff jsonb
 );
+
+-- ── 2b. Helpers de rol (ya existe usuarios_portal) ──────────────────────────
+create or replace function public.portal_rol()
+returns text language sql stable security definer set search_path = public as $$
+  select rol from public.usuarios_portal where id = auth.uid() and activo = true
+$$;
+
+create or replace function public.es_admin()
+returns boolean language sql stable security definer set search_path = public as $$
+  select coalesce(public.portal_rol() = 'admin', false)
+$$;
+
+create or replace function public.es_staff()
+returns boolean language sql stable security definer set search_path = public as $$
+  select coalesce(public.portal_rol() in ('admin','editor'), false)
+$$;
 
 -- ── 3. Triggers updated_at ──────────────────────────────────────────────────
 do $$
