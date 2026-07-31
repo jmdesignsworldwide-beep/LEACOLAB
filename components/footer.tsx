@@ -87,6 +87,12 @@ export function Footer() {
           <p>
             © {year} {siteConfig.fullName}. Todos los derechos reservados.
           </p>
+          <Link
+            href="/privacidad"
+            className="inline-flex min-h-11 items-center transition-colors hover:text-foreground sm:min-h-0"
+          >
+            Política de privacidad
+          </Link>
           <p>
             Diseñado por{" "}
             <a
