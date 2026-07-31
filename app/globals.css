@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ── Tokens de marca Beauty by Leela (hex directo) ───────────── */
+    --bl-cream: #faf6f2; /* fondo base, respiración */
+    --bl-marble: #f2ece6; /* secciones alternas */
+    --bl-gold: #c6a664; /* logo, acentos, líneas finas */
+    --bl-gold-deep: #a9884e; /* hover de dorado */
+    --bl-rose: #e0577f; /* acento de marca, CTAs secundarios */
+    --bl-rose-soft: #f3dce2; /* cards suaves, badges */
+    --bl-charcoal: #1c1a19; /* texto principal — nunca negro puro */
+    --bl-muted: #6b625c; /* texto secundario */
+    --bl-white: #ffffff;
+
+    /* ── Tokens semánticos (shadcn/ui, en HSL) ───────────────────── */
+    --background: 30 33% 96%; /* cream */
+    --foreground: 20 6% 10%; /* charcoal */
+
+    --card: 0 0% 100%;
+    --card-foreground: 20 6% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 6% 10%;
+
+    --primary: 20 6% 10%; /* charcoal — CTA principal elegante */
+    --primary-foreground: 30 33% 96%; /* cream */
+
+    --secondary: 343 69% 61%; /* rose — CTA secundario */
+    --secondary-foreground: 0 0% 100%;
+
+    --accent: 40 46% 58%; /* gold — acentos */
+    --accent-foreground: 20 6% 10%;
+
+    --muted: 27 24% 92%; /* marble suave */
+    --muted-foreground: 25 8% 40%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 30 16% 86%;
+    --input: 30 16% 86%;
+    --ring: 40 46% 58%; /* focus ring dorado */
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Titulares editoriales en Fraunces, calibrada para lujo (no juguetona) */
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+    font-variation-settings: "WONK" 0, "SOFT" 20;
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+  }
+
+  /* Focus visible consistente para navegación por teclado */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Respetar prefers-reduced-motion — requisito de accesibilidad */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* Grano de película muy sutil para fondos crema (opcional) */
+  .bl-grain {
+    position: relative;
+  }
+  .bl-grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Línea dorada de 1px — separador editorial */
+  .bl-rule {
+    height: 1px;
+    background: var(--bl-gold);
+  }
+}

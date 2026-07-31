@@ -29,12 +29,13 @@ _Diseñado por JM Nexus Designs._
 
 ---
 
-## 🔧 Pendientes al empezar la Tanda 1
+## 🔧 Acción pendiente en Vercel (Tanda 1)
 - [ ] **Vercel → Framework Preset: devolver a `Next.js`.** Durante la Tanda 0 se puso en
-      `Other` (aún no había app Next.js y el build fallaba). Al scaffoldear Next.js en la Tanda 1,
-      cambiarlo de vuelta en Vercel → Project → Settings → Build & Development Settings.
-- [ ] Retirar el placeholder estático (`index.html`, `favicon.svg`, `robots.txt`) al montar la app Next.js
-      (el `noindex` se migra al metadata del layout raíz y se mantiene hasta Tanda 12).
+      `Other`. Ahora que la app Next.js existe, cambiarlo de vuelta en
+      Vercel → Project → Settings → Build & Development Settings (o dejar que Vercel lo autodetecte).
+- [x] ~~Retirar el placeholder estático~~ — hecho: `index.html`/`favicon.svg`/`robots.txt` reemplazados
+      por la app Next.js. El `noindex` vive ahora en el metadata del layout, `app/robots.ts` y los
+      headers de `next.config.mjs` (se mantiene hasta Tanda 12).
 
 ---
 
