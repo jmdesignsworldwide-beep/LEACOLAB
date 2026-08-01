@@ -10,12 +10,15 @@ export const dynamic = "force-dynamic";
 // Módulos del portal (se activan en las fases 3b/3c).
 const modulos = [
   { label: "Panel", href: "/portal", activo: true },
-  { label: "Contenido", href: "/portal", activo: false },
-  { label: "Casos", href: "/portal", activo: false },
+  { label: "Especialistas", href: "/portal/especialistas", activo: true },
   { label: "Protocolos", href: "/portal", activo: false },
+  { label: "Casos", href: "/portal", activo: false },
+  { label: "Reseñas", href: "/portal", activo: false },
   { label: "Formación", href: "/portal", activo: false },
+  { label: "Contenido", href: "/portal", activo: false },
   { label: "Leads", href: "/portal", activo: false },
   { label: "Inteligencia", href: "/portal", activo: false },
+  { label: "Cuenta", href: "/portal/cuenta", activo: true },
 ];
 
 export default async function PortalLayout({
