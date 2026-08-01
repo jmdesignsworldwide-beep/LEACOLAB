@@ -3,22 +3,38 @@
 import { useState, useTransition } from "react";
 
 import { CONSENT_CONTACTO } from "@/lib/consent";
+import { valNombre, valContactoLibre, valMensaje, valConsentimiento } from "@/lib/validacion";
 import { Button } from "@/components/ui/button";
+import { Campo, CampoArea } from "@/components/ui/campo";
+import { FormErrorAviso } from "@/components/form-error-aviso";
 import { enviarMensaje } from "@/app/(sitio)/contacto/actions";
 
 export function ContactoForm() {
   const [pending, startTransition] = useTransition();
   const [enviado, setEnviado] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [fallo, setFallo] = useState<{ error: string; ref?: string | null } | null>(null);
   const [nombre, setNombre] = useState("");
   const [contacto, setContacto] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [consent, setConsent] = useState(false);
   const [honey, setHoney] = useState("");
+  const [errs, setErrs] = useState<{ nombre?: string | null; contacto?: string | null; mensaje?: string | null; consent?: string | null }>({});
+
+  function validarTodo() {
+    const e = {
+      nombre: valNombre(nombre),
+      contacto: valContactoLibre(contacto),
+      mensaje: valMensaje(mensaje),
+      consent: valConsentimiento(consent),
+    };
+    setErrs(e);
+    return !e.nombre && !e.contacto && !e.mensaje && !e.consent;
+  }
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
+    setFallo(null);
+    if (!validarTodo()) return;
     startTransition(async () => {
       const res = await enviarMensaje({
         nombre,
@@ -28,94 +44,86 @@ export function ContactoForm() {
         sitio_web: honey,
       });
       if (res.ok) setEnviado(true);
-      else setError(res.error);
+      else setFallo({ error: res.error, ref: res.ref });
     });
   }
 
   if (enviado) {
     return (
-      <div className="rounded-lg border border-border bg-background p-6 text-center">
-        <p className="text-fluid-base">¡Mensaje enviado!</p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Te responderemos lo antes posible.
+      <div className="rounded-lg border border-border bg-bl-marble/60 p-6 text-center md:p-8">
+        <p className="text-fluid-lg">¡Recibimos tu mensaje!</p>
+        <div className="bl-rule mx-auto mt-4 w-10 opacity-70" />
+        <p className="mt-4 text-sm text-muted-foreground">
+          Te escribimos en menos de 24 horas. Si es urgente, puedes escribirnos
+          directo por WhatsApp.
         </p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={submit} className="rounded-lg border border-border p-6 md:p-8">
+    <form onSubmit={submit} noValidate className="rounded-lg border border-border p-6 md:p-8">
       <h2 className="text-fluid-lg">Escríbenos</h2>
       <p className="mt-1 text-sm text-muted-foreground">
         ¿Tienes una duda? Déjanos tu mensaje y te contactamos.
       </p>
 
-      {/* Honeypot */}
       <div aria-hidden className="absolute left-[-9999px] h-0 w-0 overflow-hidden">
         <label>
           No llenar
-          <input
-            tabIndex={-1}
-            autoComplete="off"
-            value={honey}
-            onChange={(e) => setHoney(e.target.value)}
-          />
+          <input tabIndex={-1} autoComplete="off" value={honey} onChange={(e) => setHoney(e.target.value)} />
         </label>
       </div>
 
       <div className="mt-5 space-y-4">
-        <div>
-          <label htmlFor="c-nombre" className="text-sm">
-            Nombre
-          </label>
-          <input
-            id="c-nombre"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            autoComplete="name"
-            className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          />
-        </div>
-        <div>
-          <label htmlFor="c-contacto" className="text-sm">
-            WhatsApp o correo
-          </label>
-          <input
-            id="c-contacto"
-            value={contacto}
-            onChange={(e) => setContacto(e.target.value)}
-            className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          />
-        </div>
-        <div>
-          <label htmlFor="c-msg" className="text-sm">
-            Mensaje
-          </label>
-          <textarea
-            id="c-msg"
-            rows={4}
-            value={mensaje}
-            onChange={(e) => setMensaje(e.target.value)}
-            className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          />
-        </div>
+        <Campo
+          id="c-nombre"
+          label="Nombre"
+          value={nombre}
+          onChange={setNombre}
+          onBlur={() => setErrs((s) => ({ ...s, nombre: valNombre(nombre) }))}
+          error={errs.nombre}
+          autoComplete="name"
+        />
+        <Campo
+          id="c-contacto"
+          label="WhatsApp o correo"
+          value={contacto}
+          onChange={setContacto}
+          onBlur={() => setErrs((s) => ({ ...s, contacto: valContactoLibre(contacto) }))}
+          error={errs.contacto}
+        />
+        <CampoArea
+          id="c-msg"
+          label="Mensaje"
+          value={mensaje}
+          onChange={setMensaje}
+          onBlur={() => setErrs((s) => ({ ...s, mensaje: valMensaje(mensaje) }))}
+          error={errs.mensaje}
+        />
 
-        <label className="flex items-start gap-3 text-xs leading-relaxed text-muted-foreground">
-          <input
-            type="checkbox"
-            checked={consent}
-            onChange={(e) => setConsent(e.target.checked)}
-            className="mt-0.5 size-4 shrink-0 accent-bl-charcoal"
-          />
-          <span>{CONSENT_CONTACTO.texto}</span>
-        </label>
+        <div>
+          <label className="flex items-start gap-3 text-xs leading-relaxed text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={consent}
+              onChange={(e) => {
+                setConsent(e.target.checked);
+                setErrs((s) => ({ ...s, consent: valConsentimiento(e.target.checked) }));
+              }}
+              className="mt-0.5 size-4 shrink-0 accent-bl-charcoal"
+            />
+            <span>{CONSENT_CONTACTO.texto}</span>
+          </label>
+          {errs.consent && (
+            <p role="alert" className="mt-1 text-xs text-red-700">
+              {errs.consent}
+            </p>
+          )}
+        </div>
       </div>
 
-      {error && (
-        <p role="alert" className="mt-4 text-sm text-red-700">
-          {error}
-        </p>
-      )}
+      {fallo && <FormErrorAviso mensaje={fallo.error} refCodigo={fallo.ref} />}
 
       <div className="mt-6">
         <Button type="submit" size="lg" disabled={pending}>

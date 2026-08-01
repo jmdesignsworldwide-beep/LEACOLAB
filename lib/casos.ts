@@ -69,21 +69,18 @@ async function firmarCasos(sb: any, rows: any[]): Promise<CasoGaleria[]> {
 export async function getCasosGaleria(): Promise<CasoGaleria[]> {
   const sb = createPublicClient();
   if (!sb) return [];
-  try {
-    const { data } = await sb
-      .from("casos")
-      .select(SELECT_CASO)
-      .eq("publicado", true)
-      .is("deleted_at", null)
-      .not("imagen_antes_path", "is", null)
-      .not("imagen_despues_path", "is", null)
-      .order("orden", { ascending: true });
-    const casos = await firmarCasos(sb, data ?? []);
-    // Solo los que quedaron con ambas URLs firmadas correctamente.
-    return casos.filter((c) => c.antes && c.despues);
-  } catch {
-    return [];
-  }
+  const { data, error } = await sb
+    .from("casos")
+    .select(SELECT_CASO)
+    .eq("publicado", true)
+    .is("deleted_at", null)
+    .not("imagen_antes_path", "is", null)
+    .not("imagen_despues_path", "is", null)
+    .order("orden", { ascending: true });
+  if (error) throw new Error("No se pudieron cargar las transformaciones");
+  const casos = await firmarCasos(sb, data ?? []);
+  // Solo los que quedaron con ambas URLs firmadas correctamente.
+  return casos.filter((c) => c.antes && c.despues);
 }
 
 /** Casos de un protocolo concreto (para la página de detalle). */
@@ -92,43 +89,36 @@ export async function getCasosGaleriaPorProtocolo(
 ): Promise<CasoGaleria[]> {
   const sb = createPublicClient();
   if (!sb) return [];
-  try {
-    const { data } = await sb
-      .from("casos")
-      .select(SELECT_CASO)
-      .eq("publicado", true)
-      .is("deleted_at", null)
-      .eq("protocolo_id", protocoloId)
-      .not("imagen_antes_path", "is", null)
-      .not("imagen_despues_path", "is", null)
-      .order("orden", { ascending: true });
-    const casos = await firmarCasos(sb, data ?? []);
-    return casos.filter((c) => c.antes && c.despues);
-  } catch {
-    return [];
-  }
+  const { data, error } = await sb
+    .from("casos")
+    .select(SELECT_CASO)
+    .eq("publicado", true)
+    .is("deleted_at", null)
+    .eq("protocolo_id", protocoloId)
+    .not("imagen_antes_path", "is", null)
+    .not("imagen_despues_path", "is", null)
+    .order("orden", { ascending: true });
+  if (error) throw new Error("No se pudieron cargar las transformaciones");
+  const casos = await firmarCasos(sb, data ?? []);
+  return casos.filter((c) => c.antes && c.despues);
 }
 
 /** Un caso destacado (el primero publicado) para el preview del home. */
 export async function getCasoDestacadoGaleria(): Promise<CasoGaleria | null> {
   const sb = createPublicClient();
   if (!sb) return null;
-  try {
-    const { data } = await sb
-      .from("casos")
-      .select(SELECT_CASO)
-      .eq("publicado", true)
-      .is("deleted_at", null)
-      .not("imagen_antes_path", "is", null)
-      .not("imagen_despues_path", "is", null)
-      .order("orden", { ascending: true })
-      .limit(1);
-    const casos = await firmarCasos(sb, data ?? []);
-    const uno = casos.find((c) => c.antes && c.despues);
-    return uno ?? null;
-  } catch {
-    return null;
-  }
+  const { data, error } = await sb
+    .from("casos")
+    .select(SELECT_CASO)
+    .eq("publicado", true)
+    .is("deleted_at", null)
+    .not("imagen_antes_path", "is", null)
+    .not("imagen_despues_path", "is", null)
+    .order("orden", { ascending: true })
+    .limit(1);
+  if (error) throw new Error("No se pudieron cargar las transformaciones");
+  const casos = await firmarCasos(sb, data ?? []);
+  return casos.find((c) => c.antes && c.despues) ?? null;
 }
 
 /** Lista única de condiciones presentes, para el filtro. */

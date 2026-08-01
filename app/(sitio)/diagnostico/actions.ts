@@ -2,6 +2,7 @@
 
 import { createPublicClient } from "@/lib/supabase/public";
 import { CONSENT_LEAD } from "@/lib/consent";
+import { refCode, logServerError } from "@/lib/errors";
 import {
   focoRecomendado,
   respuestasCompletas,
@@ -39,7 +40,9 @@ export type LeadInput = {
   sitio_web?: string;
 };
 
-export type LeadResultado = { ok: true } | { ok: false; error: string };
+export type LeadResultado =
+  | { ok: true }
+  | { ok: false; error: string; ref?: string };
 
 function contactoValido(whatsapp: string, correo: string): boolean {
   const wsOk = whatsapp.replace(/\D/g, "").length >= 7;
@@ -76,8 +79,11 @@ export async function enviarLead(input: LeadInput): Promise<LeadResultado> {
   }
 
   const sb = createPublicClient();
+  const errMsg = "No pudimos enviar tu solicitud en este momento.";
   if (!sb) {
-    return { ok: false, error: "No pudimos enviar tu solicitud. Intenta luego." };
+    const ref = refCode();
+    logServerError("enviarLead: sin cliente Supabase", "missing env", ref);
+    return { ok: false, error: errMsg, ref };
   }
 
   const r = input.respuestas;
@@ -97,10 +103,14 @@ export async function enviarLead(input: LeadInput): Promise<LeadResultado> {
       consentimiento_texto_version: CONSENT_LEAD.version,
     });
     if (error) {
-      return { ok: false, error: "No pudimos enviar tu solicitud. Intenta luego." };
+      const ref = refCode();
+      logServerError("enviarLead: insert", error, ref);
+      return { ok: false, error: errMsg, ref };
     }
     return { ok: true };
-  } catch {
-    return { ok: false, error: "No pudimos enviar tu solicitud. Intenta luego." };
+  } catch (e) {
+    const ref = refCode();
+    logServerError("enviarLead: excepción", e, ref);
+    return { ok: false, error: errMsg, ref };
   }
 }

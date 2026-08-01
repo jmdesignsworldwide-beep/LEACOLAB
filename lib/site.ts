@@ -30,6 +30,13 @@ export const siteConfig = {
   },
 } as const;
 
+/** Enlace de WhatsApp con mensaje opcional pre-cargado. */
+export function whatsappUrl(mensaje?: string): string {
+  const num = siteConfig.contact.whatsapp.replace(/\D/g, "");
+  const base = `https://wa.me/1${num}`;
+  return mensaje ? `${base}?text=${encodeURIComponent(mensaje)}` : base;
+}
+
 export const navLinks = [
   { label: "Protocolos", href: "/protocolos" },
   { label: "Transformaciones", href: "/transformaciones" },
