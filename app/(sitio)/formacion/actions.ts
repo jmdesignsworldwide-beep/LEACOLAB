@@ -2,6 +2,7 @@
 
 import { createPublicClient } from "@/lib/supabase/public";
 import { CONSENT_INSCRIPCION } from "@/lib/consent";
+import { refCode, logServerError } from "@/lib/errors";
 
 export type InscripcionInput = {
   programaId: string;
@@ -13,7 +14,9 @@ export type InscripcionInput = {
   sitio_web?: string; // honeypot
 };
 
-export type FormResultado = { ok: true } | { ok: false; error: string };
+export type FormResultado =
+  | { ok: true }
+  | { ok: false; error: string; ref?: string };
 
 function contactoValido(whatsapp: string, correo: string): boolean {
   const wsOk = whatsapp.replace(/\D/g, "").length >= 7;
@@ -36,8 +39,12 @@ export async function enviarInscripcion(
     return { ok: false, error: "Déjanos un WhatsApp o correo válido." };
 
   const sb = createPublicClient();
-  if (!sb)
-    return { ok: false, error: "No pudimos enviar tu solicitud. Intenta luego." };
+  const errMsg = "No pudimos enviar tu solicitud en este momento.";
+  if (!sb) {
+    const ref = refCode();
+    logServerError("enviarInscripcion: sin cliente Supabase", "missing env", ref);
+    return { ok: false, error: errMsg, ref };
+  }
 
   try {
     const { error } = await sb.from("inscripciones_formacion").insert({
@@ -49,10 +56,15 @@ export async function enviarInscripcion(
       consentimiento_contacto: true,
       consentimiento_texto_version: CONSENT_INSCRIPCION.version,
     });
-    if (error)
-      return { ok: false, error: "No pudimos enviar tu solicitud. Intenta luego." };
+    if (error) {
+      const ref = refCode();
+      logServerError("enviarInscripcion: insert", error, ref);
+      return { ok: false, error: errMsg, ref };
+    }
     return { ok: true };
-  } catch {
-    return { ok: false, error: "No pudimos enviar tu solicitud. Intenta luego." };
+  } catch (e) {
+    const ref = refCode();
+    logServerError("enviarInscripcion: excepción", e, ref);
+    return { ok: false, error: errMsg, ref };
   }
 }

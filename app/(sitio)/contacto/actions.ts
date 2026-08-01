@@ -2,6 +2,7 @@
 
 import { createPublicClient } from "@/lib/supabase/public";
 import { CONSENT_CONTACTO } from "@/lib/consent";
+import { refCode, logServerError } from "@/lib/errors";
 
 export type MensajeInput = {
   nombre: string;
@@ -11,7 +12,9 @@ export type MensajeInput = {
   sitio_web?: string; // honeypot
 };
 
-export type FormResultado = { ok: true } | { ok: false; error: string };
+export type FormResultado =
+  | { ok: true }
+  | { ok: false; error: string; ref?: string };
 
 export async function enviarMensaje(
   input: MensajeInput
@@ -29,8 +32,12 @@ export async function enviarMensaje(
   if (!mensaje) return { ok: false, error: "Escríbenos tu mensaje." };
 
   const sb = createPublicClient();
-  if (!sb)
-    return { ok: false, error: "No pudimos enviar tu mensaje. Intenta luego." };
+  const errMsg = "No pudimos enviar tu mensaje en este momento.";
+  if (!sb) {
+    const ref = refCode();
+    logServerError("enviarMensaje: sin cliente Supabase", "missing env", ref);
+    return { ok: false, error: errMsg, ref };
+  }
 
   try {
     const { error } = await sb.from("mensajes_contacto").insert({
@@ -41,10 +48,15 @@ export async function enviarMensaje(
       consentimiento_contacto: true,
       consentimiento_texto_version: CONSENT_CONTACTO.version,
     });
-    if (error)
-      return { ok: false, error: "No pudimos enviar tu mensaje. Intenta luego." };
+    if (error) {
+      const ref = refCode();
+      logServerError("enviarMensaje: insert", error, ref);
+      return { ok: false, error: errMsg, ref };
+    }
     return { ok: true };
-  } catch {
-    return { ok: false, error: "No pudimos enviar tu mensaje. Intenta luego." };
+  } catch (e) {
+    const ref = refCode();
+    logServerError("enviarMensaje: excepción", e, ref);
+    return { ok: false, error: errMsg, ref };
   }
 }

@@ -13,7 +13,16 @@ import {
 import type { DiagnosticoContenido } from "@/lib/content";
 import { CONSENT_LEAD } from "@/lib/consent";
 import { siteConfig } from "@/lib/site";
+import {
+  valNombre,
+  valWhatsapp,
+  valCorreo,
+  valAlMenosContacto,
+  valConsentimiento,
+} from "@/lib/validacion";
 import { Button } from "@/components/ui/button";
+import { Campo } from "@/components/ui/campo";
+import { FormErrorAviso } from "@/components/form-error-aviso";
 import { registrarDiagnostico, enviarLead } from "@/app/(sitio)/diagnostico/actions";
 
 type Fase = "intro" | "quiz" | "resultado";
@@ -193,16 +202,30 @@ function Resultado({
 function ContactoLead({ resp }: { resp: RespuestasQuiz }) {
   const [pending, startTransition] = useTransition();
   const [enviado, setEnviado] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [fallo, setFallo] = useState<{ error: string; ref?: string | null } | null>(null);
   const [nombre, setNombre] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [correo, setCorreo] = useState("");
   const [consent, setConsent] = useState(false);
   const [honey, setHoney] = useState("");
+  const [errs, setErrs] = useState<Record<string, string | null>>({});
+
+  function validarTodo() {
+    const e: Record<string, string | null> = {
+      nombre: valNombre(nombre),
+      whatsapp: valWhatsapp(whatsapp),
+      correo: valCorreo(correo),
+      contacto: valAlMenosContacto(whatsapp, correo),
+      consent: valConsentimiento(consent),
+    };
+    setErrs(e);
+    return !Object.values(e).some(Boolean);
+  }
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
+    setFallo(null);
+    if (!validarTodo()) return;
     startTransition(async () => {
       const res = await enviarLead({
         respuestas: resp,
@@ -213,23 +236,25 @@ function ContactoLead({ resp }: { resp: RespuestasQuiz }) {
         sitio_web: honey,
       });
       if (res.ok) setEnviado(true);
-      else setError(res.error);
+      else setFallo({ error: res.error, ref: res.ref });
     });
   }
 
   if (enviado) {
     return (
-      <div className="mt-8 rounded-lg border border-border bg-background p-6 text-center">
-        <p className="text-fluid-base">¡Gracias! Te escribiremos muy pronto.</p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Marianny revisa personalmente cada diagnóstico.
+      <div className="mt-8 rounded-lg border border-border bg-bl-marble/60 p-6 text-center md:p-8">
+        <p className="text-fluid-lg">¡Listo, recibimos tus datos!</p>
+        <div className="bl-rule mx-auto mt-4 w-10 opacity-70" />
+        <p className="mt-4 text-sm text-muted-foreground">
+          Marianny revisa personalmente cada diagnóstico y te escribimos en menos
+          de 24 horas con tus próximos pasos.
         </p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={submit} className="mt-8 rounded-lg border border-border p-6 md:p-8">
+    <form onSubmit={submit} noValidate className="mt-8 rounded-lg border border-border p-6 md:p-8">
       <h2 className="text-fluid-base font-medium">Recibe tu plan por WhatsApp</h2>
       <p className="mt-1 text-sm text-muted-foreground">
         Opcional. Déjanos tus datos y te acompañamos con los próximos pasos.
@@ -239,73 +264,71 @@ function ContactoLead({ resp }: { resp: RespuestasQuiz }) {
       <div aria-hidden className="absolute left-[-9999px] h-0 w-0 overflow-hidden">
         <label>
           No llenar
-          <input
-            tabIndex={-1}
-            autoComplete="off"
-            value={honey}
-            onChange={(e) => setHoney(e.target.value)}
-          />
+          <input tabIndex={-1} autoComplete="off" value={honey} onChange={(e) => setHoney(e.target.value)} />
         </label>
       </div>
 
       <div className="mt-5 space-y-4">
-        <div>
-          <label htmlFor="d-nombre" className="text-sm">
-            Nombre
-          </label>
-          <input
-            id="d-nombre"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            autoComplete="name"
-            className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          />
-        </div>
+        <Campo
+          id="d-nombre"
+          label="Nombre"
+          value={nombre}
+          onChange={setNombre}
+          onBlur={() => setErrs((s) => ({ ...s, nombre: valNombre(nombre) }))}
+          error={errs.nombre}
+          autoComplete="name"
+        />
         <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="d-ws" className="text-sm">
-              WhatsApp
-            </label>
-            <input
-              id="d-ws"
-              inputMode="tel"
-              value={whatsapp}
-              onChange={(e) => setWhatsapp(e.target.value)}
-              autoComplete="tel"
-              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-          </div>
-          <div>
-            <label htmlFor="d-correo" className="text-sm">
-              Correo
-            </label>
-            <input
-              id="d-correo"
-              type="email"
-              value={correo}
-              onChange={(e) => setCorreo(e.target.value)}
-              autoComplete="email"
-              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-          </div>
-        </div>
-
-        <label className="flex items-start gap-3 text-xs leading-relaxed text-muted-foreground">
-          <input
-            type="checkbox"
-            checked={consent}
-            onChange={(e) => setConsent(e.target.checked)}
-            className="mt-0.5 size-4 shrink-0 accent-bl-charcoal"
+          <Campo
+            id="d-ws"
+            label="WhatsApp"
+            value={whatsapp}
+            onChange={setWhatsapp}
+            onBlur={() => setErrs((s) => ({ ...s, whatsapp: valWhatsapp(whatsapp), contacto: valAlMenosContacto(whatsapp, correo) }))}
+            error={errs.whatsapp}
+            inputMode="tel"
+            autoComplete="tel"
           />
-          <span>{CONSENT_LEAD.texto}</span>
-        </label>
+          <Campo
+            id="d-correo"
+            label="Correo"
+            value={correo}
+            onChange={setCorreo}
+            onBlur={() => setErrs((s) => ({ ...s, correo: valCorreo(correo), contacto: valAlMenosContacto(whatsapp, correo) }))}
+            error={errs.correo}
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+          />
+        </div>
+        {errs.contacto && !errs.whatsapp && !errs.correo && (
+          <p role="alert" className="text-xs text-red-700">
+            {errs.contacto}
+          </p>
+        )}
+
+        <div>
+          <label className="flex items-start gap-3 text-xs leading-relaxed text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={consent}
+              onChange={(e) => {
+                setConsent(e.target.checked);
+                setErrs((s) => ({ ...s, consent: valConsentimiento(e.target.checked) }));
+              }}
+              className="mt-0.5 size-4 shrink-0 accent-bl-charcoal"
+            />
+            <span>{CONSENT_LEAD.texto}</span>
+          </label>
+          {errs.consent && (
+            <p role="alert" className="mt-1 text-xs text-red-700">
+              {errs.consent}
+            </p>
+          )}
+        </div>
       </div>
 
-      {error && (
-        <p role="alert" className="mt-4 text-sm text-red-700">
-          {error}
-        </p>
-      )}
+      {fallo && <FormErrorAviso mensaje={fallo.error} refCodigo={fallo.ref} />}
 
       <div className="mt-6">
         <Button type="submit" size="lg" disabled={pending}>

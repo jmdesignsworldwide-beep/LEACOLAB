@@ -30,20 +30,17 @@ export const MODALIDAD_LABEL: Record<string, string> = {
 export async function getProgramas(): Promise<Programa[]> {
   const sb = createPublicClient();
   if (!sb) return [];
-  try {
-    const { data } = await sb
-      .from("programas_formacion")
-      .select(
-        "id, slug, nombre, tipo, para_quien, requisitos, modalidad, duracion_texto, cupo, temario, inversion, imagen_path"
-      )
-      .eq("activo", true)
-      .is("deleted_at", null)
-      .order("orden", { ascending: true });
-    return (data ?? []).map((p) => ({
-      ...p,
-      temario: p.temario ?? [],
-    })) as Programa[];
-  } catch {
-    return [];
-  }
+  const { data, error } = await sb
+    .from("programas_formacion")
+    .select(
+      "id, slug, nombre, tipo, para_quien, requisitos, modalidad, duracion_texto, cupo, temario, inversion, imagen_path"
+    )
+    .eq("activo", true)
+    .is("deleted_at", null)
+    .order("orden", { ascending: true });
+  if (error) throw new Error("No se pudo cargar la formación");
+  return (data ?? []).map((p) => ({
+    ...p,
+    temario: p.temario ?? [],
+  })) as Programa[];
 }

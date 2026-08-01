@@ -16,20 +16,17 @@ export async function getProtocolosDestacados(
 ): Promise<ProtocoloCard[]> {
   const sb = createPublicClient();
   if (!sb) return [];
-  try {
-    const { data } = await sb
-      .from("protocolos")
-      .select(
-        "id, slug, nombre, descripcion, para_quien, imagen_path, inversion_min, inversion_max"
-      )
-      .eq("publicado", true)
-      .is("deleted_at", null)
-      .order("orden", { ascending: true })
-      .limit(limite);
-    return data ?? [];
-  } catch {
-    return [];
-  }
+  const { data, error } = await sb
+    .from("protocolos")
+    .select(
+      "id, slug, nombre, descripcion, para_quien, imagen_path, inversion_min, inversion_max"
+    )
+    .eq("publicado", true)
+    .is("deleted_at", null)
+    .order("orden", { ascending: true })
+    .limit(limite);
+  if (error) throw new Error("No se pudieron cargar los protocolos");
+  return data ?? [];
 }
 
 export type EspecialistaCard = {
@@ -44,17 +41,14 @@ export type EspecialistaCard = {
 export async function getEspecialistas(): Promise<EspecialistaCard[]> {
   const sb = createPublicClient();
   if (!sb) return [];
-  try {
-    const { data } = await sb
-      .from("especialistas")
-      .select("id, nombre, especialidad, anios, bio, foto_path")
-      .eq("publicado", true)
-      .is("deleted_at", null)
-      .order("orden", { ascending: true });
-    return data ?? [];
-  } catch {
-    return [];
-  }
+  const { data, error } = await sb
+    .from("especialistas")
+    .select("id, nombre, especialidad, anios, bio, foto_path")
+    .eq("publicado", true)
+    .is("deleted_at", null)
+    .order("orden", { ascending: true });
+  if (error) throw new Error("No se pudo cargar el equipo");
+  return data ?? [];
 }
 
 export type Fase = {
@@ -117,17 +111,14 @@ const SELECT_PROTOCOLO =
 export async function getProtocolos(): Promise<Protocolo[]> {
   const sb = createPublicClient();
   if (!sb) return [];
-  try {
-    const { data } = await sb
-      .from("protocolos")
-      .select(SELECT_PROTOCOLO)
-      .eq("publicado", true)
-      .is("deleted_at", null)
-      .order("orden", { ascending: true });
-    return (data ?? []).map(normalizaProtocolo);
-  } catch {
-    return [];
-  }
+  const { data, error } = await sb
+    .from("protocolos")
+    .select(SELECT_PROTOCOLO)
+    .eq("publicado", true)
+    .is("deleted_at", null)
+    .order("orden", { ascending: true });
+  if (error) throw new Error("No se pudieron cargar los protocolos");
+  return (data ?? []).map(normalizaProtocolo);
 }
 
 export async function getProtocoloPorSlug(
@@ -135,18 +126,15 @@ export async function getProtocoloPorSlug(
 ): Promise<Protocolo | null> {
   const sb = createPublicClient();
   if (!sb) return null;
-  try {
-    const { data } = await sb
-      .from("protocolos")
-      .select(SELECT_PROTOCOLO)
-      .eq("slug", slug)
-      .eq("publicado", true)
-      .is("deleted_at", null)
-      .maybeSingle();
-    return data ? normalizaProtocolo(data) : null;
-  } catch {
-    return null;
-  }
+  const { data, error } = await sb
+    .from("protocolos")
+    .select(SELECT_PROTOCOLO)
+    .eq("slug", slug)
+    .eq("publicado", true)
+    .is("deleted_at", null)
+    .maybeSingle();
+  if (error) throw new Error("No se pudo cargar el protocolo");
+  return data ? normalizaProtocolo(data) : null;
 }
 
 // Los casos (antes/después) viven en el bucket privado y se sirven con URLs
