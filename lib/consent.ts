@@ -9,3 +9,15 @@ export const CONSENT_LEAD = {
   texto:
     "Autorizo a Beauty by Leela a contactarme por WhatsApp o correo para dar seguimiento a mi diagnóstico. Mis datos se tratan de forma confidencial, no se comparten con terceros y puedo pedir su eliminación cuando quiera.",
 } as const;
+
+export const CONSENT_INSCRIPCION = {
+  version: "2026-08-inscripcion-v1",
+  texto:
+    "Autorizo a Beauty by Leela a contactarme por WhatsApp o correo para dar seguimiento a mi solicitud de formación. Mis datos se tratan de forma confidencial, no se comparten con terceros y puedo pedir su eliminación cuando quiera.",
+} as const;
+
+export const CONSENT_CONTACTO = {
+  version: "2026-08-contacto-v1",
+  texto:
+    "Autorizo a Beauty by Leela a contactarme para responder mi mensaje. Mis datos se tratan de forma confidencial, no se comparten con terceros y puedo pedir su eliminación cuando quiera.",
+} as const;
