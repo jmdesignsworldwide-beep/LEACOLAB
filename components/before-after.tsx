@@ -17,12 +17,17 @@ export function BeforeAfter({
   despues,
   etiquetaAntes = "Antes",
   etiquetaDespues = "Después",
+  blurDataURL,
+  sizes = "(min-width: 768px) 45vw, 90vw",
 }: {
   antes: string;
   despues: string;
   etiquetaAntes?: string;
   etiquetaDespues?: string;
+  blurDataURL?: string;
+  sizes?: string;
 }) {
+  const placeholder = blurDataURL ? ("blur" as const) : undefined;
   const ref = useRef<HTMLDivElement>(null);
   const [ancho, setAncho] = useState(0);
   const [frac, setFrac] = useState(0.5); // 0..1 posición del divisor
@@ -71,7 +76,9 @@ export function BeforeAfter({
         src={antes}
         alt={etiquetaAntes}
         fill
-        sizes="(min-width: 768px) 45vw, 90vw"
+        sizes={sizes}
+        placeholder={placeholder}
+        blurDataURL={blurDataURL}
         className="pointer-events-none object-cover"
       />
       {/* Después (encima, recortado hasta el divisor) */}
@@ -83,7 +90,9 @@ export function BeforeAfter({
           src={despues}
           alt={etiquetaDespues}
           fill
-          sizes="(min-width: 768px) 45vw, 90vw"
+          sizes={sizes}
+          placeholder={placeholder}
+          blurDataURL={blurDataURL}
           className="pointer-events-none object-cover"
         />
       </div>

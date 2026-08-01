@@ -4,7 +4,8 @@ import {
   type SantuarioContenido,
   type SeccionEncabezado,
 } from "@/lib/content";
-import { getProtocolosDestacados, getCasoDestacado } from "@/lib/catalogo";
+import { getProtocolosDestacados } from "@/lib/catalogo";
+import { getCasoDestacadoGaleria } from "@/lib/casos";
 import { Hero } from "@/components/home/hero";
 import { Santuario } from "@/components/home/santuario";
 import { ProtocolosPreview } from "@/components/home/protocolos-preview";
@@ -21,7 +22,7 @@ export default async function HomePage() {
       getContenido<SeccionEncabezado>("home_protocolos"),
       getContenido<SeccionEncabezado>("home_transformaciones"),
       getProtocolosDestacados(3),
-      getCasoDestacado(),
+      getCasoDestacadoGaleria(),
     ]);
 
   return (
