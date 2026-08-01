@@ -82,3 +82,10 @@ Estos puntos quedan puestos a propósito mientras el sitio está en construcció
 - [ ] **Pasada de rendimiento:** investigar el LCP del método **simulado** (Lantern / PageSpeed
       Insights) — en Tanda 1 marcaba ~2.6s (real 1.6s). Es el número que ve cualquiera que evalúe
       el sitio desde fuera; la palanca es recortar Framer Motion del hilo principal.
+- [ ] **Activar `auth_leaked_password_protection`** en Supabase → Authentication → Policies
+      (Password Protection). Lo marca el Security Advisor como WARN; es un toggle, no requiere código.
+- [ ] **Heartbeat de Supabase** (GitHub Actions) para que el proyecto free no se pause por
+      inactividad — un cron que haga un `select` trivial cada pocos días.
+- [ ] **SEO / Schema:** metadatos por página (títulos y `description`), OpenGraph, `sitemap.xml`,
+      y Schema `LocalBusiness` — este último **solo cuando la clienta confirme las coordenadas**
+      del Google Business (ver `docs/DATOS-NEGOCIO.md`).
