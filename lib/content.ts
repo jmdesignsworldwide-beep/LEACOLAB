@@ -36,6 +36,34 @@ export type SeccionEncabezado = {
   cta_texto?: string;
 };
 
+export type NosotrasContenido = {
+  kicker?: string;
+  titulo?: string;
+  historia?: string[] | string; // párrafos
+  foto_path?: string;
+};
+
+export type MedicoContenido = {
+  activo?: boolean; // false/ausente → estado vacío "en preparación"
+  nombre?: string;
+  credenciales?: string;
+  bio?: string;
+  foto_path?: string;
+};
+
+export type AgendarAviso = {
+  titulo?: string;
+  puntos?: string[]; // precio 1ra cita, depósito RD$1,000, WhatsApp con código, evaluada por Marianny
+  nota?: string;
+  cta_texto?: string;
+};
+
+export type PrimeraCita = {
+  monto_texto?: string; // "RD$ 3,000"
+  equivalente?: string; // "US$ 50"
+  nota?: string; // "el plan exacto se define en la evaluación…"
+};
+
 export type SantuarioContenido = {
   kicker?: string;
   titulo?: string;
