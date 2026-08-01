@@ -51,11 +51,17 @@ export default async function ProtocolosPage() {
           {principales.length > 0 && (
             <section className="container mt-14">
               <div className="grid gap-6 md:grid-cols-2">
-                {principales.map((p, i) => (
-                  <Reveal key={p.id} delay={0.08 + i * 0.06}>
-                    <ProtocoloCard protocolo={p} />
-                  </Reveal>
-                ))}
+                {principales.map((p, i) =>
+                  // Las primeras tarjetas están en el primer pliegue: se
+                  // renderizan visibles (sin Reveal) para no bloquear el LCP.
+                  i < 2 ? (
+                    <ProtocoloCard key={p.id} protocolo={p} prioridad />
+                  ) : (
+                    <Reveal key={p.id} delay={0.08 + (i - 2) * 0.06}>
+                      <ProtocoloCard protocolo={p} />
+                    </Reveal>
+                  )
+                )}
               </div>
             </section>
           )}

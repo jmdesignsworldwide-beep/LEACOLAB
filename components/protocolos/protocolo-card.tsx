@@ -6,7 +6,13 @@ import { urlPublica } from "@/lib/storage";
 import { rangoInversion } from "@/lib/format";
 import { ViewTransitionLink } from "@/components/view-transition-link";
 
-export function ProtocoloCard({ protocolo }: { protocolo: Protocolo }) {
+export function ProtocoloCard({
+  protocolo,
+  prioridad = false,
+}: {
+  protocolo: Protocolo;
+  prioridad?: boolean;
+}) {
   const img = urlPublica(protocolo.imagen_path);
   const desde = rangoInversion(protocolo.inversion_min, protocolo.inversion_max);
   const vtName = `proto-img-${protocolo.slug}`;
@@ -22,6 +28,7 @@ export function ProtocoloCard({ protocolo }: { protocolo: Protocolo }) {
             src={img}
             alt=""
             fill
+            priority={prioridad}
             sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
             className="object-cover transition-transform duration-500 group-hover:scale-[1.06]"
             style={{ viewTransitionName: vtName } as CSSProperties}
