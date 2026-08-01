@@ -64,6 +64,17 @@ export type PrimeraCita = {
   nota?: string; // "el plan exacto se define en la evaluación…"
 };
 
+export type ContactoInfo = {
+  kicker?: string;
+  titulo?: string;
+  intro?: string;
+  direccion?: string;
+  horario?: string[]; // una línea por día/franja
+  whatsapp?: string; // solo dígitos; si falta se usa siteConfig
+  correo?: string;
+  nota?: string;
+};
+
 export type DiagnosticoContenido = {
   kicker?: string;
   titulo?: string;
