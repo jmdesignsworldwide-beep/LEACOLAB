@@ -34,12 +34,23 @@ const noindexGlobal = { key: "X-Robots-Tag", value: "noindex, nofollow" };
 // ⚠️ noindex del PORTAL — PERMANENTE. NO RETIRAR NUNCA, ni en la Tanda 12.
 const noindexPortal = { key: "X-Robots-Tag", value: "noindex, nofollow" };
 
+const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
+  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
+  : undefined;
+
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   eslint: { ignoreDuringBuilds: true },
   images: {
     formats: ["image/avif", "image/webp"],
+    remotePatterns: supabaseHost
+      ? [{ protocol: "https", hostname: supabaseHost }]
+      : [],
+  },
+  experimental: {
+    // Subida de imágenes del portal vía server actions.
+    serverActions: { bodySizeLimit: "6mb" },
   },
   async headers() {
     return [
