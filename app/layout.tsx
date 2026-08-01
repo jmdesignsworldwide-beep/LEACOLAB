@@ -2,8 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, Geist } from "next/font/google";
 
 import { siteConfig } from "@/lib/site";
-import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -55,11 +53,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es" className={`${fraunces.variable} ${geist.variable}`}>
-      <body className="min-h-svh bg-background text-foreground">
-        <Navbar />
-        <main id="contenido">{children}</main>
-        <Footer />
-      </body>
+      <body className="min-h-svh bg-background text-foreground">{children}</body>
     </html>
   );
 }
