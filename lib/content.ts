@@ -64,6 +64,13 @@ export type PrimeraCita = {
   nota?: string; // "el plan exacto se define en la evaluación…"
 };
 
+export type DiagnosticoContenido = {
+  kicker?: string;
+  titulo?: string;
+  intro?: string;
+  cta_texto?: string; // texto del botón para comenzar
+};
+
 export type SantuarioContenido = {
   kicker?: string;
   titulo?: string;
