@@ -30,6 +30,12 @@ export type HeroContenido = {
   cta_secundario?: string;
 };
 
+export type SeccionEncabezado = {
+  kicker?: string;
+  titulo?: string;
+  cta_texto?: string;
+};
+
 export type SantuarioContenido = {
   kicker?: string;
   titulo?: string;
