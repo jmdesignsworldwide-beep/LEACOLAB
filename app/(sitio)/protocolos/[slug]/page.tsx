@@ -3,12 +3,11 @@ import Image from "next/image";
 import type { CSSProperties } from "react";
 import { notFound } from "next/navigation";
 
-import {
-  getProtocoloPorSlug,
-  getCasosPorProtocolo,
-} from "@/lib/catalogo";
+import { getProtocoloPorSlug } from "@/lib/catalogo";
+import { getCasosGaleriaPorProtocolo } from "@/lib/casos";
 import { getContenido, type PrimeraCita, type AgendarAviso } from "@/lib/content";
 import { urlPublica } from "@/lib/storage";
+import { BLUR_MARBLE } from "@/lib/blur";
 import { Reveal } from "@/components/reveal";
 import { FasesFijadas } from "@/components/protocolos/fases-fijadas";
 import { Inversion } from "@/components/protocolos/inversion";
@@ -40,7 +39,7 @@ export default async function ProtocoloDetalle({
   ]);
   if (!protocolo) notFound();
 
-  const casos = await getCasosPorProtocolo(protocolo.id);
+  const casos = await getCasosGaleriaPorProtocolo(protocolo.id);
   const img = urlPublica(protocolo.imagen_path);
   const vtName = `proto-img-${protocolo.slug}`;
 
@@ -109,24 +108,23 @@ export default async function ProtocoloDetalle({
             <h2 className="text-center text-fluid-2xl">Transformaciones</h2>
           </Reveal>
           <div className="mx-auto mt-10 grid max-w-3xl gap-8 sm:grid-cols-2">
-            {casos.slice(0, 2).map((c) => {
-              const antes = urlPublica(c.imagen_antes_path);
-              const despues = urlPublica(c.imagen_despues_path);
-              if (!antes || !despues) return null;
-              return (
-                <Reveal key={c.id}>
-                  <BeforeAfter antes={antes} despues={despues} />
-                  <p className="mt-3 text-center text-sm text-muted-foreground">
-                    {[
-                      c.condicion,
-                      c.semana_tratamiento ? `Semana ${c.semana_tratamiento}` : null,
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </p>
-                </Reveal>
-              );
-            })}
+            {casos.slice(0, 2).map((c) => (
+              <Reveal key={c.id}>
+                <BeforeAfter
+                  antes={c.antes!}
+                  despues={c.despues!}
+                  blurDataURL={BLUR_MARBLE}
+                />
+                <p className="mt-3 text-center text-sm text-muted-foreground">
+                  {[
+                    c.condicion,
+                    c.semana_tratamiento ? `Semana ${c.semana_tratamiento}` : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+              </Reveal>
+            ))}
           </div>
         </section>
       )}

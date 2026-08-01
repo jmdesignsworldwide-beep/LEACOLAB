@@ -1,8 +1,8 @@
 import Link from "next/link";
 
-import type { CasoDestacado } from "@/lib/catalogo";
+import type { CasoGaleria } from "@/lib/casos";
 import type { SeccionEncabezado } from "@/lib/content";
-import { urlPublica } from "@/lib/storage";
+import { BLUR_MARBLE } from "@/lib/blur";
 import { Reveal } from "@/components/reveal";
 import { Button } from "@/components/ui/button";
 import { BeforeAfter } from "@/components/before-after";
@@ -11,11 +11,11 @@ export function TransformacionesPreview({
   caso,
   encabezado,
 }: {
-  caso: CasoDestacado | null;
+  caso: CasoGaleria | null;
   encabezado: SeccionEncabezado | null;
 }) {
-  const antes = urlPublica(caso?.imagen_antes_path);
-  const despues = urlPublica(caso?.imagen_despues_path);
+  const antes = caso?.antes ?? null;
+  const despues = caso?.despues ?? null;
   const hay = Boolean(antes && despues);
 
   return (
@@ -24,7 +24,7 @@ export function TransformacionesPreview({
         {/* Slider a la izquierda en desktop */}
         <Reveal>
           {hay ? (
-            <BeforeAfter antes={antes!} despues={despues!} />
+            <BeforeAfter antes={antes!} despues={despues!} blurDataURL={BLUR_MARBLE} />
           ) : (
             <div className="flex aspect-[4/5] flex-col items-center justify-center rounded-lg border border-dashed border-border bg-bl-marble text-center">
               <div className="bl-rule w-10 opacity-60" />
