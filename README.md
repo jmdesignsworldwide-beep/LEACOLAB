@@ -84,8 +84,13 @@ Estos puntos quedan puestos a propósito mientras el sitio está en construcció
       el sitio desde fuera; la palanca es recortar Framer Motion del hilo principal.
 - [ ] **Activar `auth_leaked_password_protection`** en Supabase → Authentication → Policies
       (Password Protection). Lo marca el Security Advisor como WARN; es un toggle, no requiere código.
-- [ ] **Heartbeat de Supabase** (GitHub Actions) para que el proyecto free no se pause por
-      inactividad — un cron que haga un `select` trivial cada pocos días.
+- [ ] **Latido de mantenimiento** (GitHub Actions) — como en JIMAR. NO basta un `select`
+      trivial: en el free de Supabase `pg_cron` **no corre mientras el proyecto está pausado y
+      no rellena corridas perdidas**, así que la tabla `eventos` (cruda) crecería sin purgarse.
+      El Action, que corre en infra externa, debe **despertar Supabase y ejecutar el
+      mantenimiento** cada pocos días: `select public.rollup_inteligencia(3);` (rollup con
+      recuperación de días perdidos + purga del crudo >90 días incorporada). pg_cron queda solo
+      como red secundaria. Requiere un secreto con la service key o un endpoint firmado.
 - [ ] **SEO / Schema:** metadatos por página (títulos y `description`), OpenGraph, `sitemap.xml`,
       y Schema `LocalBusiness` — este último **solo cuando la clienta confirme las coordenadas**
       del Google Business (ver `docs/DATOS-NEGOCIO.md`).

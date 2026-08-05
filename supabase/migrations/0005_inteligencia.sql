@@ -108,8 +108,9 @@ begin
   end loop;
 end $$;
 
--- 4) Rollup diario del crudo → agregados. Idempotente por día.
-create or replace function public.rollup_inteligencia(d date default (current_date - 1))
+-- 4) Rollup del crudo → agregados. Idempotente por día (delete+insert), para
+--    poder re-procesar días perdidos si el proyecto estuvo pausado.
+create or replace function public.rollup_inteligencia_dia(d date)
 returns void
 language plpgsql
 security definer
@@ -229,8 +230,30 @@ begin
   group by r.ruta, coalesce(c.c, false);
 end $$;
 
-revoke all on function public.rollup_inteligencia(date) from anon, authenticated;
+-- Envoltura con RECUPERACIÓN: procesa los últimos `dias` días. Si el proyecto
+-- estuvo pausado y pg_cron se saltó una corrida, la siguiente rellena hasta 3
+-- días atrás. Es lo que llamará el latido de GitHub Actions (Tanda 13), que
+-- corre en infra externa y despierta + procesa aunque Supabase estuviera dormido.
+create or replace function public.rollup_inteligencia(dias int default 3)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare i int;
+begin
+  for i in 0 .. greatest(0, dias - 1) loop
+    perform public.rollup_inteligencia_dia((current_date - 1 - i)::date);
+  end loop;
+  -- Salvaguarda de retención: por si la purga de eventos no corrió (proyecto
+  -- pausado), volver a limpiar el crudo antiguo aquí también.
+  delete from public.eventos where created_at < now() - interval '90 days';
+end $$;
 
--- 5) Programación diaria (00:20 UTC, tras la consolidación de eventos_diarios)
+revoke all on function public.rollup_inteligencia_dia(date) from anon, authenticated;
+revoke all on function public.rollup_inteligencia(int) from anon, authenticated;
+
+-- 5) pg_cron como red secundaria (00:20 UTC). El motor PRINCIPAL y confiable
+--    será el latido de GitHub Actions llamando a rollup_inteligencia(3).
 select cron.schedule('bbl-rollup-inteligencia', '20 0 * * *',
-  $$ select public.rollup_inteligencia(); $$);
+  $$ select public.rollup_inteligencia(3); $$);
