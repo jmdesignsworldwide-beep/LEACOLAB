@@ -11,6 +11,7 @@ import {
   valConsentimiento,
 } from "@/lib/validacion";
 import { Button } from "@/components/ui/button";
+import { marcarEvento } from "@/lib/track/marca";
 import { Campo, CampoArea } from "@/components/ui/campo";
 import { FormErrorAviso } from "@/components/form-error-aviso";
 import { enviarInscripcion } from "@/app/(sitio)/formacion/actions";
@@ -60,8 +61,10 @@ export function InscripcionForm({
         consentimiento: consent,
         sitio_web: honey,
       });
-      if (res.ok) setEnviado(true);
-      else setFallo({ error: res.error, ref: res.ref });
+      if (res.ok) {
+        setEnviado(true);
+        marcarEvento("contacto-enviado");
+      } else setFallo({ error: res.error, ref: res.ref });
     });
   }
 

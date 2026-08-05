@@ -20,6 +20,7 @@ import {
   valAlMenosContacto,
   valConsentimiento,
 } from "@/lib/validacion";
+import { marcarEvento } from "@/lib/track/marca";
 import { Button } from "@/components/ui/button";
 import { Campo } from "@/components/ui/campo";
 import { FormErrorAviso } from "@/components/form-error-aviso";
@@ -148,6 +149,7 @@ function Resultado({
   useEffect(() => {
     // Registro anónimo (inteligencia agregada, sin datos personales).
     registrarDiagnostico(resp);
+    marcarEvento("diagnostico-fin"); // paso del embudo: terminó el diagnóstico
   }, [resp]);
 
   const foco = focoRecomendado(resp);
@@ -173,7 +175,7 @@ function Resultado({
 
         <div className="mt-7 flex flex-col gap-3 sm:flex-row">
           <Button asChild size="lg">
-            <a href={siteConfig.setmoreUrl} target="_blank" rel="noreferrer">
+            <a href={siteConfig.setmoreUrl} target="_blank" rel="noreferrer" data-track="agendar">
               Agendar mi evaluación
             </a>
           </Button>
@@ -235,8 +237,10 @@ function ContactoLead({ resp }: { resp: RespuestasQuiz }) {
         consentimiento: consent,
         sitio_web: honey,
       });
-      if (res.ok) setEnviado(true);
-      else setFallo({ error: res.error, ref: res.ref });
+      if (res.ok) {
+        setEnviado(true);
+        marcarEvento("contacto-enviado"); // paso del embudo: dejó contacto
+      } else setFallo({ error: res.error, ref: res.ref });
     });
   }
 

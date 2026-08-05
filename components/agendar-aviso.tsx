@@ -33,7 +33,7 @@ export function AgendarAvisoBloque({ aviso }: { aviso: AgendarAviso | null }) {
 
       <div className="mt-7">
         <Button asChild size="lg">
-          <a href={siteConfig.setmoreUrl} target="_blank" rel="noreferrer">
+          <a href={siteConfig.setmoreUrl} target="_blank" rel="noreferrer" data-track="agendar">
             {aviso?.cta_texto ?? "Agendar mi evaluación"}
           </a>
         </Button>
