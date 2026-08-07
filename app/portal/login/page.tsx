@@ -1,7 +1,8 @@
 "use client";
 
-import { Suspense, useActionState } from "react";
+import { Suspense, useActionState, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 
 import { iniciarSesion, type LoginState } from "./actions";
 import { Logo } from "@/components/logo";
@@ -18,6 +19,12 @@ function LoginForm() {
     iniciarSesion,
     errorInicial
   );
+
+  // Campos controlados: NO se borran aunque el login falle y la vista se
+  // vuelva a renderizar con el error.
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [verClave, setVerClave] = useState(false);
 
   return (
     <main className="flex min-h-svh items-center justify-center bg-bl-marble px-5">
@@ -41,6 +48,8 @@ function LoginForm() {
               type="email"
               required
               autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="mt-1 h-11 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
           </div>
@@ -48,14 +57,31 @@ function LoginForm() {
             <label htmlFor="password" className="text-sm text-foreground/80">
               Contraseña
             </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              autoComplete="current-password"
-              className="mt-1 h-11 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
+            <div className="relative mt-1">
+              <input
+                id="password"
+                name="password"
+                type={verClave ? "text" : "password"}
+                required
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="h-11 w-full rounded-md border border-input bg-background px-3 pr-11 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+              <button
+                type="button"
+                onClick={() => setVerClave((v) => !v)}
+                aria-label={verClave ? "Ocultar contraseña" : "Mostrar contraseña"}
+                aria-pressed={verClave}
+                className="absolute inset-y-0 right-0 grid w-11 place-items-center text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                {verClave ? (
+                  <EyeOff className="size-4" aria-hidden />
+                ) : (
+                  <Eye className="size-4" aria-hidden />
+                )}
+              </button>
+            </div>
           </div>
 
           {state?.error && (
