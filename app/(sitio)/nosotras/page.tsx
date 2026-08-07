@@ -201,7 +201,7 @@ export default async function NosotrasPage() {
               </a>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link href="/formacion">Conocer la formación</Link>
+              <Link href="/servicios">Ver servicios</Link>
             </Button>
           </div>
         </Reveal>

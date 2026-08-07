@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 
 import type { HeroContenido } from "@/lib/content";
 import { urlPublica } from "@/lib/storage";
+import { siteConfig } from "@/lib/site";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 
@@ -97,7 +98,9 @@ export function Hero({ contenido }: { contenido: HeroContenido | null }) {
             >
               {contenido?.cta_primario && (
                 <Button asChild size="lg" className="w-full sm:w-auto">
-                  <Link href="/diagnostico">{contenido.cta_primario}</Link>
+                  <a href={siteConfig.setmoreUrl} target="_blank" rel="noreferrer">
+                    {contenido.cta_primario}
+                  </a>
                 </Button>
               )}
               {contenido?.cta_secundario && (
@@ -107,7 +110,7 @@ export function Hero({ contenido }: { contenido: HeroContenido | null }) {
                   variant="outline"
                   className="w-full sm:w-auto"
                 >
-                  <Link href="/formacion">{contenido.cta_secundario}</Link>
+                  <Link href="/servicios">{contenido.cta_secundario}</Link>
                 </Button>
               )}
             </div>
