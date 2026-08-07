@@ -7,7 +7,7 @@ import { cerrarSesion } from "./actions";
 // El portal es privado y depende de la sesión: nunca se prerenderiza.
 export const dynamic = "force-dynamic";
 
-// Módulos del portal (se activan en las fases 3b/3c).
+// Módulos del portal (se activan por fase). `soloAdmin` los oculta a la editora.
 const modulos = [
   { label: "Panel", href: "/portal", activo: true },
   { label: "Contenido", href: "/portal", activo: false },
@@ -15,8 +15,8 @@ const modulos = [
   { label: "Protocolos", href: "/portal", activo: false },
   { label: "Formación", href: "/portal", activo: false },
   { label: "Leads", href: "/portal", activo: false },
-  { label: "Inteligencia", href: "/portal", activo: false },
-];
+  { label: "Inteligencia", href: "/portal/inteligencia", activo: true, soloAdmin: true },
+] as const;
 
 export default async function PortalLayout({
   children,
@@ -33,7 +33,9 @@ export default async function PortalLayout({
         </div>
         <nav className="flex-1 px-3 py-4">
           <ul className="space-y-1">
-            {modulos.map((m) => (
+            {modulos
+              .filter((m) => !("soloAdmin" in m && m.soloAdmin) || usuario.rol === "admin")
+              .map((m) => (
               <li key={m.label}>
                 {m.activo ? (
                   <Link

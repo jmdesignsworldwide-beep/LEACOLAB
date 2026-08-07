@@ -53,7 +53,7 @@ export default async function ContactoPage() {
             </p>
             <div className="mt-5">
               <Button asChild size="lg">
-                <a href={siteConfig.setmoreUrl} target="_blank" rel="noreferrer">
+                <a href={siteConfig.setmoreUrl} target="_blank" rel="noreferrer" data-track="agendar">
                   Agendar por Setmore
                 </a>
               </Button>
