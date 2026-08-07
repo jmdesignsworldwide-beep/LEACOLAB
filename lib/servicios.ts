@@ -36,12 +36,10 @@ export async function getServicios(): Promise<CategoriaServicios[]> {
     .is("deleted_at", null)
     .order("categoria_orden", { ascending: true })
     .order("orden", { ascending: true });
-  if (error) {
-    // La tabla aún no existe (migración 0006 sin aplicar): estado vacío, no
-    // rompe el build/prerender. Cualquier otro error sí se propaga.
-    if (error.code === "42P01") return [];
-    throw new Error("No se pudieron cargar los servicios");
-  }
+  // /servicios es una página ISR prerenderizada: un throw aquí rompe el build
+  // (error.tsx no captura errores de prerender). Ante cualquier fallo de carga
+  // —incluida la tabla aún sin crear— degradamos al estado vacío.
+  if (error) return [];
 
   const grupos: CategoriaServicios[] = [];
   for (const s of (data ?? []) as Servicio[]) {
