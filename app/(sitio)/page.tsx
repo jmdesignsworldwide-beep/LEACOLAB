@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 
 import {
   getContenido,
@@ -6,59 +7,66 @@ import {
   type SantuarioContenido,
   type SeccionEncabezado,
 } from "@/lib/content";
-import { getProtocolosDestacados } from "@/lib/catalogo";
 import { getCasoDestacadoGaleria } from "@/lib/casos";
+import { siteConfig } from "@/lib/site";
 import { Hero } from "@/components/home/hero";
 import { Santuario } from "@/components/home/santuario";
-import { ProtocolosPreview } from "@/components/home/protocolos-preview";
 import { TransformacionesPreview } from "@/components/home/transformaciones-preview";
 import { SectionBoundary } from "@/components/section-boundary";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 // ISR: el contenido se edita en Supabase; se revalida periódicamente.
 export const revalidate = 300;
 
 export default async function HomePage() {
-  // Contenido de marca (tolerante a fallos: cae a textos por defecto).
-  const [hero, santuario, encProtocolos, encTransf] = await Promise.all([
+  const [hero, santuario, encGaleria] = await Promise.all([
     getContenido<HeroContenido>("home_hero"),
     getContenido<SantuarioContenido>("home_santuario"),
-    getContenido<SeccionEncabezado>("home_protocolos"),
     getContenido<SeccionEncabezado>("home_transformaciones"),
   ]);
 
   return (
     <>
-      {/* Above-the-fold: se renderiza directo (LCP seguro, sin suspense). */}
+      {/* Above-the-fold: directo (LCP seguro). */}
       <Hero contenido={hero} />
       <Santuario contenido={santuario} />
 
-      {/* Secciones con datos: cada una carga, y falla, de forma aislada. */}
-      <SectionBoundary titulo="No pudimos cargar los protocolos">
-        <Suspense fallback={<PreviewSkeleton />}>
-          <ProtocolosSlot encabezado={encProtocolos} />
-        </Suspense>
-      </SectionBoundary>
+      {/* Servicios (teaser informativo) */}
+      <section className="container py-20 text-center md:py-28">
+        <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">
+          Servicios
+        </p>
+        <h2 className="mx-auto mt-4 max-w-xl text-fluid-2xl">
+          Tratamientos faciales, corporales y avanzados
+        </h2>
+        <p className="mx-auto mt-5 max-w-lg text-sm leading-relaxed text-muted-foreground">
+          Cada servicio con su duración y precio, para que sepas exactamente qué
+          esperar antes de reservar.
+        </p>
+        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+          <Button asChild size="lg">
+            <a href={siteConfig.setmoreUrl} target="_blank" rel="noreferrer">
+              Reservar cita
+            </a>
+          </Button>
+          <Button asChild size="lg" variant="outline">
+            <Link href="/servicios">Ver servicios y precios</Link>
+          </Button>
+        </div>
+      </section>
 
-      <SectionBoundary titulo="No pudimos cargar las transformaciones">
+      {/* Galería (teaser) — carga aislada */}
+      <SectionBoundary titulo="No pudimos cargar la galería">
         <Suspense fallback={<PreviewSkeleton conImagen />}>
-          <TransformacionesSlot encabezado={encTransf} />
+          <GaleriaSlot encabezado={encGaleria} />
         </Suspense>
       </SectionBoundary>
     </>
   );
 }
 
-async function ProtocolosSlot({
-  encabezado,
-}: {
-  encabezado: SeccionEncabezado | null;
-}) {
-  const protocolos = await getProtocolosDestacados(3);
-  return <ProtocolosPreview protocolos={protocolos} encabezado={encabezado} />;
-}
-
-async function TransformacionesSlot({
+async function GaleriaSlot({
   encabezado,
 }: {
   encabezado: SeccionEncabezado | null;

@@ -69,8 +69,8 @@ export function TransformacionesPreview({
           <Reveal delay={0.28}>
             <div className="mt-8">
               <Button asChild size="lg">
-                <Link href="/transformaciones">
-                  {encabezado?.cta_texto ?? "Ver transformaciones"}
+                <Link href="/galeria">
+                  {encabezado?.cta_texto ?? "Ver galería"}
                 </Link>
               </Button>
             </div>
