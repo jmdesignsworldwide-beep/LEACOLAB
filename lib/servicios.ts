@@ -36,7 +36,12 @@ export async function getServicios(): Promise<CategoriaServicios[]> {
     .is("deleted_at", null)
     .order("categoria_orden", { ascending: true })
     .order("orden", { ascending: true });
-  if (error) throw new Error("No se pudieron cargar los servicios");
+  if (error) {
+    // La tabla aún no existe (migración 0006 sin aplicar): estado vacío, no
+    // rompe el build/prerender. Cualquier otro error sí se propaga.
+    if (error.code === "42P01") return [];
+    throw new Error("No se pudieron cargar los servicios");
+  }
 
   const grupos: CategoriaServicios[] = [];
   for (const s of (data ?? []) as Servicio[]) {
